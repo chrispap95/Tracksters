@@ -1,0 +1,8 @@
+<use name="FWCore/MessageLogger"/>
+<use name="FWCore/Framework"/>
+<use name="FWCore/Utilities"/>
+<use name="FWCore/ParameterSet"/>
+<use name="DataFormats/HGCalReco"/>
+<library file="*.cc" name="TrackstersTest">
+  <flags EDM_PLUGIN="1"/>
+</library>

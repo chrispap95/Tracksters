@@ -1,0 +1,4 @@
+<use name="DataFormats/HGCalReco"/>
+<export>
+  <lib   name="1"/>
+</export>
