@@ -56,7 +56,7 @@ void TrackstersTest::analyze(const edm::Event& iEvent, const edm::EventSetup& iS
     const auto &eigenvalues = it->eigenvalues();
     auto &edges = it->edges();
 
-    std::cout << "Trackster\nVertices: ";
+    std::cout << "Trackster\nVertices (" << vertices.size() << "): ";
     for (std::vector<unsigned int>::const_iterator it_vert = vertices.begin(); it_vert != vertices.end(); it_vert++){
       std::cout << *it_vert << ", ";
     }
@@ -64,8 +64,8 @@ void TrackstersTest::analyze(const edm::Event& iEvent, const edm::EventSetup& iS
     for (std::vector<unsigned int>::const_iterator it_vert = vertices.begin(); it_vert != vertices.end(); it_vert++){
       auto cluster = layerClusters->at(*it_vert);
       std::vector<std::pair<DetId, float>> clusterDetIds = cluster.hitsAndFractions();
-      //std::cout << "(" << HGCSiliconDetId(cluster.seed()).layer() << ",";
-      //std::cout << HGCSiliconDetId(clusterDetIds[0].first).layer() << "), ";
+      std::cout << "(" << HGCSiliconDetId(cluster.seed()).layer() << ",";
+      std::cout << HGCSiliconDetId(clusterDetIds[0].first).layer() << "), ";
     }
 
     std::unordered_set<unsigned int> targetVert;
