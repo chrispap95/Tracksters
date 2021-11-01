@@ -3,6 +3,12 @@ import FWCore.ParameterSet.VarParsing as VarParsing
 
 options = VarParsing.VarParsing ('python')
 
+options.register('input',
+                 500, # default value
+                 VarParsing.VarParsing.multiplicity.singleton, # singleton or list
+                 VarParsing.VarParsing.varType.int,         # string, int, or float
+                 "Number of events.")
+
 options.register('delta',
                  '1p5', # default value
                  VarParsing.VarParsing.multiplicity.singleton, # singleton or list
@@ -40,13 +46,13 @@ tags = {
         "4p5":"210917_164445",
     },
     "clue3D": {
-        "1p5":"211007_214742",
-        "2":  "211007_214757",
-        "2p5":"211007_214812",
-        "3":  "211007_214827",
-        "3p5":"211007_214843",
-        "4":  "211007_214857",
-        "4p5":"211007_214913",
+        "1p5":"211012_151154",
+        "2":  "211012_151213",
+        "2p5":"211012_151230",
+        "3":  "211012_151248",
+        "3p5":"211012_151307",
+        "4":  "211012_151325",
+        "4p5":"211012_151342",
     },
 }
 
@@ -55,7 +61,7 @@ process.load('RecoHGCal.Configuration.recoHGCAL_cff')
 process.load('Configuration.EventContent.EventContent_cff')
 process.load("FWCore.MessageService.MessageLogger_cfi")
 
-process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(500) )
+process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(options.input) )
 
 directory = "/store/user/chpapage/CloseByDoubleGamma_E25Eta1p88Delta"+\
             options.delta+"/CloseByDoubleGamma_E25Eta1p88Delta"+options.delta+\

@@ -14,7 +14,7 @@ void plotter_compMethod(){
 
   TFile* f[nd];
   for (size_t i = 0; i < nd; ++i) {
-    f[i] = TFile::Open("output/hist_"+deltas[i]+".root");
+    f[i] = TFile::Open("output/hist_clue3D_"+deltas[i]+".root");
   }
 
   TCanvas* c1 = new TCanvas("c1","canvas 1",1);
@@ -37,9 +37,9 @@ void plotter_compMethod(){
       hs[j]->Draw("NOSTACK PLC");
       hs[j]->GetXaxis()->SetTitle("centrality");
       lg->Draw();
-      if (j == 0) c1->Print("output/"+deltas[i]+"PerLayer.pdf(");
-      else if (j == 27) c1->Print("output/"+deltas[i]+"PerLayer.pdf)");
-      else c1->Print("output/"+deltas[i]+"PerLayer.pdf");
+      if (j == 0) c1->Print("output/"+deltas[i]+"PerLayer_clue3D.pdf(");
+      else if (j == 27) c1->Print("output/"+deltas[i]+"PerLayer_clue3D.pdf)");
+      else c1->Print("output/"+deltas[i]+"PerLayer_clue3D.pdf");
     }
   }
 }

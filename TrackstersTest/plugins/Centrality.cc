@@ -42,7 +42,7 @@ class Centrality : public edm::EDAnalyzer {
 
 Centrality::Centrality(const edm::ParameterSet& iConfig)
 {
-  tracksters_ = consumes<std::vector<ticl::Trackster>>(edm::InputTag("ticlTrackstersEM"));
+  tracksters_ = consumes<std::vector<ticl::Trackster>>(edm::InputTag("ticlTrackstersCLUE3DHigh"));
   layerClusters_ = consumes<std::vector<reco::CaloCluster>>(edm::InputTag("hgcalLayerClusters"));
   edm::Service<TFileService> fs;
   for (unsigned i = 1; i < 29; ++i) {

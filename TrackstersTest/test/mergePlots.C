@@ -16,10 +16,10 @@ void mergePlots(){
 
   TFile* f[nd];
   for (size_t i = 0; i < nd; ++i) {
-    f[i] = TFile::Open("output/hist_"+deltas[i]+".root");
+    f[i] = TFile::Open("output/hist_clue3D_"+deltas[i]+".root");
   }
 
-  TFile* fout = new TFile("output/hist_merged.root", "RECREATE");
+  TFile* fout = new TFile("output/hist_clue3D_merged.root", "RECREATE");
   TCanvas* c1 = new TCanvas("c1","canvas 1",1);
   TCanvas* c2 = new TCanvas("c2","canvas 2",1);
   TMultiGraph* mg_mean[layers];
@@ -71,9 +71,9 @@ void mergePlots(){
     mg_mean[j]->GetXaxis()->SetTitle("delta [cm]");
     mg_mean[j]->GetYaxis()->SetTitle("<centrality>");
     lg_mean->Draw();
-    if (j == 0) c1->Print("output/meanVsDeltaPerLayer.pdf(");
-    else if (j == 27) c1->Print("output/meanVsDeltaPerLayer.pdf)");
-    else c1->Print("output/meanVsDeltaPerLayer.pdf");
+    if (j == 0) c1->Print("output/meanVsDeltaPerLayer_clue3D.pdf(");
+    else if (j == 27) c1->Print("output/meanVsDeltaPerLayer_clue3D.pdf)");
+    else c1->Print("output/meanVsDeltaPerLayer_clue3D.pdf");
     c2->cd();
     mg_rms[j]->SetTitle("layer "+lr);
     mg_rms[j]->GetXaxis()->SetLimits(1, 5);
@@ -82,9 +82,9 @@ void mergePlots(){
     mg_rms[j]->GetXaxis()->SetTitle("delta [cm]");
     mg_rms[j]->GetYaxis()->SetTitle("RMS(centrality)");
     lg_rms->Draw();
-    if (j == 0) c2->Print("output/rmsVsDeltaPerLayer.pdf(");
-    else if (j == 27) c2->Print("output/rmsVsDeltaPerLayer.pdf)");
-    else c2->Print("output/rmsVsDeltaPerLayer.pdf");
+    if (j == 0) c2->Print("output/rmsVsDeltaPerLayer_clue3D.pdf(");
+    else if (j == 27) c2->Print("output/rmsVsDeltaPerLayer_clue3D.pdf)");
+    else c2->Print("output/rmsVsDeltaPerLayer_clue3D.pdf");
   }
 
   fout->Close();
