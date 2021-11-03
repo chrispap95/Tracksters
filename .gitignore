@@ -3,3 +3,4 @@
 ._*
 *.pdf
 .fuse*
+__pycache__/
