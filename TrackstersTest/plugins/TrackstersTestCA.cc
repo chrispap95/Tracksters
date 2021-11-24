@@ -1,5 +1,6 @@
 #include <string>
 #include <iostream>
+#include <fstream>
 #include <vector>
 
 #include "FWCore/Framework/interface/EDAnalyzer.h"
@@ -36,8 +37,11 @@ TrackstersTestCA::TrackstersTestCA(const edm::ParameterSet& iConfig) {
 
 TrackstersTestCA::~TrackstersTestCA() {}
 
+std::ofstream fileoutCA("graphsCA.py");
+
 void TrackstersTestCA::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup) {
-  const bool debug = false;
+  bool debug = false;
+  edm::EventNumber_t evtNum = iEvent.eventAuxiliary().event();
   edm::Handle<std::vector<ticl::Trackster>> tracksterHandle;
   edm::Handle<std::vector<reco::CaloCluster>> layerClustersHandle;
   const std::vector<ticl::Trackster> *tracksters;
@@ -53,16 +57,17 @@ void TrackstersTestCA::analyze(const edm::Event& iEvent, const edm::EventSetup& 
   }
 
   for (std::vector<ticl::Trackster>::const_iterator it = tracksters->begin(); it != tracksters->end(); ++it) {
+    size_t trkNum = 1;
     const std::vector<unsigned int> &vertices = it->vertices();
-    const auto &eigenvalues = it->eigenvalues();
     auto &edges = it->edges();
 
-    if (debug) std::cout << "Trackster\nVertices (" << vertices.size() << "): ";
-    else std::cout << "G.add_nodes_from([";
+    fileoutCA << "G" << evtNum << "_" << trkNum << " = nx.Graph()\n";
+    fileoutCA << "G" << evtNum << "_" << trkNum << ".add_nodes_from([";
+
     for (std::vector<unsigned int>::const_iterator it_vert = vertices.begin(); it_vert != vertices.end(); it_vert++) {
-      std::cout << *it_vert << ", ";
+      fileoutCA << *it_vert << ", ";
     }
-    if (!debug) std::cout << "])\n";
+    fileoutCA << "])\n";
 
     if (debug) {
       std::cout << "\nVertice layers: ";
@@ -74,21 +79,19 @@ void TrackstersTestCA::analyze(const edm::Event& iEvent, const edm::EventSetup& 
       }
     }
 
-    if (debug) std::cout << "\nEdges: ";
-    else std::cout << "G.add_edges_from([";
+    fileoutCA << "G" << evtNum << "_" << trkNum << ".add_edges_from([";
     for (auto edge : edges) {
-      std::cout << "(" << edge[0] << "," << edge[1] << ")" << ", ";
+      fileoutCA << "(" << edge[0] << "," << edge[1] << ")" << ", ";
     }
-    if (!debug) std::cout << "])\n";
+    fileoutCA << "])\n\n";
 
-    if (debug) {
-      std::cout << "\nEigenvalues: " << eigenvalues[0] << ", " << eigenvalues[1] << ", " << eigenvalues[2];
-      std::cout << std::endl;
-    }
+    trkNum++;
   }
 }
 
-void TrackstersTestCA::beginJob() {}
+void TrackstersTestCA::beginJob() {
+  fileoutCA << "import networkx as nx\n\n";
+}
 
 void TrackstersTestCA::endJob() {}
 

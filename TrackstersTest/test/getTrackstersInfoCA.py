@@ -6,7 +6,7 @@ process.load('RecoHGCal.Configuration.recoHGCAL_cff')
 process.load('Configuration.EventContent.EventContent_cff')
 process.load("FWCore.MessageService.MessageLogger_cfi")
 
-process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(10) )
+process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(5) )
 
 delta = '1p5'
 campaign = 'camp6'
