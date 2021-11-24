@@ -18,6 +18,11 @@ cmsrun getTrackstersInfoCLUE3D.py
 
 For different samples change lines 15 in getTrackstersInfoCA.py and getTrackstersInfoCLUE3D.py.
 
+To plot the networks
+```bash
+python plotGraphs.py
+```
+
 To run the centrality calculation:
 ```bash
 cd TrackstersTest/test
