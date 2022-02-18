@@ -1,3 +1,10 @@
+/******************************************************************
+**
+**  This script merges all the different deltas into a single file.
+**  It also creates mean and rms plots vs the delta for each layer.
+**
+******************************************************************/
+
 #include "RootStyle.cc"
 
 void mergePlots(){

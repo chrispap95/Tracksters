@@ -1,3 +1,10 @@
+/*******************************************************************
+**
+**  Comparison plots: centrality distributions with different deltas
+**  on each plot. Centrality methods are shown separately.
+**
+*******************************************************************/
+
 #include "RootStyle.cc"
 
 void plotter_compDist(){

@@ -1,5 +1,6 @@
 import FWCore.ParameterSet.Config as cms
 import FWCore.ParameterSet.VarParsing as VarParsing
+from campaigns import tags
 
 options = VarParsing.VarParsing ('python')
 
@@ -16,7 +17,7 @@ options.register('delta',
                  "Value of delta.")
 
 options.register('cmssw',
-                 'CMSSW_11_3_4', # default value
+                 'CMSSW_12_0_2', # default value
                  VarParsing.VarParsing.multiplicity.singleton, # singleton or list
                  VarParsing.VarParsing.varType.string,         # string, int, or float
                  "Value of CMSSW.")
@@ -28,33 +29,24 @@ options.register('geometry',
                  "Value of geometry.")
 
 options.register('campaign',
-                 'camp5', # default value
+                 'camp6', # default value
                  VarParsing.VarParsing.multiplicity.singleton, # singleton or list
                  VarParsing.VarParsing.varType.string,         # string, int, or float
                  "Value of campaign.")
 
-options.parseArguments()
+options.register('directed',
+                 0, # default value
+                 VarParsing.VarParsing.multiplicity.singleton, # singleton or list
+                 VarParsing.VarParsing.varType.bool,         # string, int, or float
+                 "Create directed or undirected graph.")
 
-tags = {
-    "camp5": {
-        "1p5":"210917_164144",
-        "2":  "210917_164210",
-        "2p5":"210917_164241",
-        "3":  "210917_164306",
-        "3p5":"210917_164333",
-        "4":  "210917_164402",
-        "4p5":"210917_164445",
-    },
-    "clue3D": {
-        "1p5":"211012_151154",
-        "2":  "211012_151213",
-        "2p5":"211012_151230",
-        "3":  "211012_151248",
-        "3p5":"211012_151307",
-        "4":  "211012_151325",
-        "4p5":"211012_151342",
-    },
-}
+options.register('weighted',
+                 0, # default value
+                 VarParsing.VarParsing.multiplicity.singleton, # singleton or list
+                 VarParsing.VarParsing.varType.int,         # string, int, or float
+                 "Creates weighted graph if not 0. Methods 1 through 3.")
+
+options.parseArguments()
 
 process = cms.Process("Demo")
 process.load('RecoHGCal.Configuration.recoHGCAL_cff')
@@ -84,10 +76,30 @@ process.source = cms.Source("PoolSource",
     duplicateCheckMode = cms.untracked.string("noDuplicateCheck")
 )
 
-process.ana = cms.EDAnalyzer('Centrality')
+isCLUE3D = False
+if options.campaign == 'clue3D':
+    isCLUE3D = True
+
+process.ana = cms.EDAnalyzer('Centrality',
+    directed = cms.bool(options.directed),
+    weightMode = cms.int32(0),
+    isCLUE3D = cms.bool(isCLUE3D)
+)
+
+# Create output tag for filename
+nameTag = 'hist_'
+if options.campaign == 'clue3D':
+    nameTag += 'CLUE3D_'
+else:
+    nameTag += 'CA_'
+nameTag += options.delta
+if options.directed:
+    nameTag += "_directed"
+if options.weighted:
+    nameTag += "_weighted%d"%(options.weighted)
 
 process.TFileService = cms.Service("TFileService",
-    fileName = cms.string('output/hist_clue3D_'+options.delta+'.root')
+    fileName = cms.string('output/'+nameTag+'.root')
 )
 
 process.p = cms.Path(process.ana)
