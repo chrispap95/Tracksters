@@ -1,3 +1,7 @@
+#
+# This script runs the module TrackstersTestCLUE3D.
+#
+
 import FWCore.ParameterSet.Config as cms
 from campaigns import tags
 

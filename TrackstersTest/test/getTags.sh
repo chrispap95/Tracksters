@@ -1,4 +1,7 @@
 #!/bin/bash
+#
+# This script prints out the date tags for the generated samples.
+#
 
 campaign=camp6
 

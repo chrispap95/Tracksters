@@ -1,3 +1,7 @@
+#
+# This script plots the automatically generated graphs using networkx
+#
+
 import networkx as nx
 import matplotlib.pyplot as plt
 import graphsCA_1, graphsCLUE3D_1

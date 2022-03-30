@@ -1,3 +1,4 @@
+# This file contains only the date tags for the generated samples.
 # Campaigns are:
 #      - "camp5": deprecated
 #      - "camp6": for CA
