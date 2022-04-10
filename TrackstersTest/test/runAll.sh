@@ -6,7 +6,8 @@ do
   do
     for k in 0 1 2 3 4;
     do
-      cmsRun runCentrality.py delta=${i} cmssw=CMSSW_12_0_2 campaign=clue3D directed=${j} weighted=${k} &
+      cmsRun runCentrality_cfg.py delta=${i} cmssw=CMSSW_12_0_2 campaign=clue3D directed=${j} weighted=${k} &
+      echo "Running delta=${i} directed=${j} weighted=${k}"
     done
     wait
   done

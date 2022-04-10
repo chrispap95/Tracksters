@@ -5,10 +5,10 @@ void plotter_compWeights(){
   TString deltas[] = {"1p5", "2", "2p5", "3", "3p5", "4", "4p5"};
   TString methods[] = {"e", "k", "pr"};
   TString methods_desc[] = {"Eigenvector", "Katz", "PageRank"};
-  TString weights[] = {"0", "1", "2", "3"};
-  TString weights_desc[] = {"unweighted", "max(E1,E2)", "|E2-E1|", "distance^{-1}","|E2-E1|/distance"};
+  TString weights[] = {"0", "1", "2", "3", "4"};
+  TString weights_desc[] = {"unweighted", "max(E1,E2)", "|E2-E1|", "distance^{-1}", "|E2-E1|/distance"};
   TString directed[] = {"","_directed"};
-  //gStyle->SetPalette(112);
+  gStyle->SetPalette(kWaterMelon);
 
   const size_t nd = sizeof(deltas)/sizeof(deltas[0]);
   const size_t nm = sizeof(methods)/sizeof(methods[0]);
@@ -16,7 +16,7 @@ void plotter_compWeights(){
   const size_t nl = sizeof(weights)/sizeof(weights[0]);
   const size_t layers = 28;
 
-  TFile* f[nd][nu][nl];
+  TFile* f[nd][nl][nu];
   for (size_t i = 0; i < nd; ++i) {
     for (size_t l = 0; l < nl; ++l) {
       for (size_t j = 0; j < nu; ++j) {
@@ -54,9 +54,9 @@ void plotter_compWeights(){
           hs[j]->Draw("NOSTACK PLC");
           hs[j]->GetXaxis()->SetTitle("centrality");
           lg->Draw();
-          if (j == 0) c1->Print("output/weighted"+weights[l]+"_"+methods_desc[k]+"_"+deltas[i]+"PerLayer_clue3D.pdf(");
-          else if (j == 27) c1->Print("output/weighted"+weights[l]+"_"+methods_desc[k]+"_"+deltas[i]+"PerLayer_clue3D.pdf)");
-          else c1->Print("output/weighted"+weights[l]+"_"+methods_desc[k]+"_"+deltas[i]+"PerLayer_clue3D.pdf");
+          if (j == 0) c1->Print("plots/weighted"+weights[l]+"_"+methods_desc[k]+"_"+deltas[i]+"PerLayer_clue3D.pdf(");
+          else if (j == 27) c1->Print("plots/weighted"+weights[l]+"_"+methods_desc[k]+"_"+deltas[i]+"PerLayer_clue3D.pdf)");
+          else c1->Print("plots/weighted"+weights[l]+"_"+methods_desc[k]+"_"+deltas[i]+"PerLayer_clue3D.pdf");
         }
       }
     }

@@ -16,6 +16,7 @@
 #include "DataFormats/CaloRecHit/interface/CaloCluster.h"
 #include "DataFormats/ForwardDetId/interface/HGCSiliconDetId.h"
 #include "DataFormats/DetId/interface/DetId.h"
+#include "Tracksters/TrackstersTest/interface/TracksterUtilities.h"
 
 #include <Eigen/Core>
 #include <Eigen/Dense>
@@ -27,7 +28,6 @@ class Centrality : public edm::EDAnalyzer {
  public:
   explicit Centrality(const edm::ParameterSet&);
   ~Centrality() override;
-  double calcWt(const int, const reco::CaloCluster&, const reco::CaloCluster&, const int);
 
  private:
   virtual void beginJob() override;
@@ -64,41 +64,6 @@ Centrality::Centrality(const edm::ParameterSet& iConfig)
 
 Centrality::~Centrality() {}
 
-double Centrality::calcWt(const int mode, const reco::CaloCluster& cluster1, const reco::CaloCluster& cluster2, const int n = 1) {
-  double weight;
-  const double E1 = cluster1.energy();
-  const double E2 = cluster2.energy();
-  const double dx = cluster2.x()-cluster1.x();
-  const double dy = cluster2.y()-cluster1.y();
-  const double dz = cluster2.z()-cluster1.z();
-  const double dist = sqrt(pow(dx,2)+pow(dy,2)+pow(dz,2));
-  /*
-  ** Default is not weighted
-  ** Method 1: max(E1, E2)
-  ** Method 2: |E1 - E2|
-  ** Method 3: (d)^(-n)
-  ** Method 4: (method 1 or 2)*(method 3)
-  */
-  switch (mode) {
-    default:
-      weight = 1;
-      break;
-    case 1:
-      weight = std::max(E1, E2);
-      break;
-    case 2:
-      weight = abs(E1-E2);
-      break;
-    case 3:
-      weight = pow(dist,-n);
-      break;
-    case 4:
-      weight = abs(E1-E2)*pow(dist,-n);
-      break;
-  }
-  return weight;
-}
-
 void Centrality::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup) {
   edm::Handle<std::vector<ticl::Trackster>> tracksterHandle;
   edm::Handle<std::vector<reco::CaloCluster>> layerClustersHandle;
@@ -120,25 +85,10 @@ void Centrality::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup
 
     // Define commonly used objects
     size_t nV = vertices.size();
-    Eigen::MatrixXd adj = Eigen::MatrixXd::Zero(nV,nV);
-    Eigen::MatrixXd id = Eigen::MatrixXd::Identity(nV,nV);
-    Eigen::VectorXd v_ones = Eigen::VectorXd::Ones(nV);
-    Eigen::MatrixXd m_ones = Eigen::MatrixXd::Ones(nV,nV);
+    std::cout << "Weight mode is: " << weightMode_ << "\n";
 
     // Fill adjacency matrix
-    for (auto edge : edges) {
-      unsigned idx0 = std::find(vertices.begin(),vertices.end(),edge[0]) - vertices.begin();
-      unsigned idx1 = std::find(vertices.begin(),vertices.end(),edge[1]) - vertices.begin();
-      if (idx0 == nV || idx1 == nV) {
-        std::cout << "Warning: vertice is out of bounds.\n";
-        continue;
-      }
-      const auto cluster1 = layerClusters->at(edge[0]);
-      const auto cluster2 = layerClusters->at(edge[1]);
-      double weight = Centrality::calcWt(weightMode_, cluster1, cluster2, 1);
-      adj(idx0,idx1) = weight;
-      if (!directed_) adj(idx1,idx0) = weight;
-    }
+    auto adj = ticl::adjacency(weightMode_, directed_, vertices, edges, layerClusters);
 
     // Fill list of layer numbers
     unsigned layers[nV];
@@ -150,22 +100,13 @@ void Centrality::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup
     }
 
     // Compute eigenvalues & eigenvectors
-    Eigen::SelfAdjointEigenSolver<Eigen::MatrixXd> eigensolver(adj);
-    if (eigensolver.info() != Eigen::Success) abort();
-    if (eigensolver.eigenvalues()[nV-1] == 0) continue;
-    auto c_eig = eigensolver.eigenvectors().col(nV-1);
+    auto c_eig = ticl::centralityEigenvector(adj);
 
     // Katz centrality calculation
-    const float alpha = 0.9/eigensolver.eigenvalues()[nV-1]; // has to be smaller than 1/(largest eigenvalue)
-    Eigen::VectorXd c_katz = ((id-alpha*adj.transpose()).inverse()-id)*v_ones;
+    auto c_katz = ticl::centralityKatz(adj);
 
     // PageRank calculation
-    const float df = 0.85;
-    Eigen::MatrixXd m_pr = df*adj+(1-df)*m_ones/nV;
-    Eigen::SelfAdjointEigenSolver<Eigen::MatrixXd> eigensolver_pr(m_pr);
-    if (eigensolver_pr.info() != Eigen::Success) abort();
-    if (eigensolver_pr.eigenvalues()[nV-1] == 0) continue;
-    auto c_pr = eigensolver_pr.eigenvectors().col(nV-1);
+    auto c_pr = ticl::centralityPageRank(adj);
 
     // Calculate normalization factors
     double norm_eig = 0;

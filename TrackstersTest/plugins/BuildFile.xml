@@ -6,6 +6,7 @@
 <use name="DataFormats/HGCalReco"/>
 <use name="CommonTools/UtilAlgos"/>
 <use name="PhysicsTools/UtilAlgos"/>
+<use name="Tracksters/TrackstersTest"/>
 <library file="*.cc" name="TrackstersTest">
   <flags EDM_PLUGIN="1"/>
 </library>

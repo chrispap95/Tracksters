@@ -21,10 +21,9 @@ Below are a few typical workflows using the code in this repository.
 First, run the following scripts on the samples to print out the trackster details:
 ```bash
 cd TrackstersTest/test
-cmsRun getTrackstersInfoCA.py
-cmsRun getTrackstersInfoCLUE3D.py
+cmsRun getTrackstersInfo.py
 ```
-These scripts are going to create the files `graphsCA.py` and `graphsCLUE3D.py`.
+This script is going to create a file named `graphsCA.py` or `graphsCLUE3D.py`, depending on the settings.
 The script `plotGraphs.py` can then be used to plot the graphs.
 
 ## Centrality
@@ -35,7 +34,6 @@ cmsRun runCentrality.py
 ```
 This script is very customizable and accepts the following options:
 ```
-Singletons:
   campaign           : camp6
                      - Value of campaign.
   cmssw              : CMSSW_12_0_2
@@ -44,8 +42,6 @@ Singletons:
                      - Value of delta.
   directed           : 0
                      - Create directed or undirected graph.
-  filePrepend        :
-                     - String to prepend location of all files
   geometry           : D76
                      - Value of geometry.
   input              : 500
@@ -54,16 +50,8 @@ Singletons:
                      - Number of events to process (-1 for all)
   outputFile         : output.root
                      - Name of output file (if needed)
-  secondaryOutputFile:
-                     - Name of second output file (if needed)
-  section            : 0
-                     - This section (from 1..totalSections inclusive)
-  storePrepend       :
-                     - Prepend location of files starting with '/store'
   tag                :
                      - tag to add to output filename
-  totalSections      : 0
-                     - Total number of sections
   weighted           : 0
                      - Creates weighted graph if not 0. Methods 1 through 3.
 ```

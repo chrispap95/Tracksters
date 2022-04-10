@@ -1,6 +1,6 @@
 import FWCore.ParameterSet.Config as cms
 import FWCore.ParameterSet.VarParsing as VarParsing
-from campaigns import tags
+from campaigns_cff import tags
 
 options = VarParsing.VarParsing ('python')
 
@@ -82,7 +82,7 @@ if options.campaign == 'clue3D':
 
 process.ana = cms.EDAnalyzer('Centrality',
     directed = cms.bool(options.directed),
-    weightMode = cms.int32(0),
+    weightMode = cms.int32(options.weighted),
     isCLUE3D = cms.bool(isCLUE3D)
 )
 
