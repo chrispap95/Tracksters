@@ -63,34 +63,40 @@ namespace ticl {
   }
 
   Eigen::VectorXd centralityEigenvector(const Eigen::MatrixXd& adj) {
-    const int nV = adj.rows();
+    const size_t nV = adj.rows();
     Eigen::SelfAdjointEigenSolver<Eigen::MatrixXd> eigensolver(adj);
     if (eigensolver.info() != Eigen::Success) abort();
     if (eigensolver.eigenvalues()[nV-1] == 0) std::cout << "[centralityEigenvector] Warning: trivial solution\n";
-    auto c_eig = eigensolver.eigenvectors().col(nV-1);
+    auto c_eig = (Eigen::VectorXd)eigensolver.eigenvectors().col(nV-1);
+    if (c_eig(0) < 0) c_eig *= -1;
+    c_eig.normalize();
     return c_eig;
   }
 
   Eigen::VectorXd centralityKatz(const Eigen::MatrixXd& adj) {
-    const int nV = adj.rows();
+    const size_t nV = adj.rows();
     Eigen::VectorXd v_ones = Eigen::VectorXd::Ones(nV);
     Eigen::MatrixXd id = Eigen::MatrixXd::Identity(nV,nV);
     Eigen::SelfAdjointEigenSolver<Eigen::MatrixXd> eigensolver(adj);
     if (eigensolver.info() != Eigen::Success) abort();
     if (eigensolver.eigenvalues()[nV-1] == 0) std::cout << "[centralityKatz] Warning: trivial solution\n";
     const float alpha = 0.9/eigensolver.eigenvalues()[nV-1]; // has to be smaller than 1/(largest eigenvalue)
-    auto c_katz = ((id-alpha*adj.transpose()).inverse()-id)*v_ones;
+    auto c_katz = (Eigen::VectorXd)(((id-alpha*adj.transpose()).inverse()-id)*v_ones);
+    if (c_katz[0] < 0) c_katz *= -1;
+    c_katz.normalize();
     return c_katz;
   }
 
   Eigen::VectorXd centralityPageRank(const Eigen::MatrixXd& adj, const float df) {
-    const int nV = adj.rows();
+    const size_t nV = adj.rows();
     Eigen::MatrixXd m_ones = Eigen::MatrixXd::Ones(nV,nV);
     auto m_pr = df*adj+(1-df)*m_ones/nV;
     Eigen::SelfAdjointEigenSolver<Eigen::MatrixXd> eigensolver_pr(m_pr);
     if (eigensolver_pr.info() != Eigen::Success) abort();
     if (eigensolver_pr.eigenvalues()[nV-1] == 0) std::cout << "[centralityPageRank] Warning: trivial solution\n";
-    auto c_pr = eigensolver_pr.eigenvectors().col(nV-1);
+    auto c_pr = (Eigen::VectorXd)eigensolver_pr.eigenvectors().col(nV-1);
+    if (c_pr[0] < 0) c_pr *= -1;
+    c_pr.normalize();
     return c_pr;
   }
 }  // namespace ticl

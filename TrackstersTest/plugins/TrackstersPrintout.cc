@@ -66,6 +66,8 @@ void TrackstersPrintout::analyze(const edm::Event& iEvent, const edm::EventSetup
     return;
   }
 
+  // Initialize graph dictionary for the event
+  fileout << "graphs[" << evtNum << "] = {}\n";
   // Keeps track of the number of tracksters in a single event
   size_t trkNum = 1;
 
@@ -75,60 +77,39 @@ void TrackstersPrintout::analyze(const edm::Event& iEvent, const edm::EventSetup
     auto &edges = it->edges();
     auto seedIndex = it->seedIndex();
 
-    // Initialize graph and pass seed index (to be implemented)
-    fileout << "seedIndex" << evtNum << "_" << trkNum << " = " << seedIndex << "\n";
-    fileout << "G" << evtNum << "_" << trkNum << " = nx.Graph()\n";
+    // Initialize graph and pass seed index
+    fileout << "graphs[" << evtNum << "][" << trkNum << "] = {}\n";
+    fileout << "graphs[" << evtNum << "][" << trkNum << "]['seedIndex'] = " << seedIndex << "\n";
+    fileout << "graphs[" << evtNum << "][" << trkNum << "]['graph'] =  nx.Graph()\n";
 
     // Populate nodes
-    fileout << "G" << evtNum << "_" << trkNum << ".add_nodes_from([";
+    fileout << "graphs[" << evtNum << "][" << trkNum << "]['graph'].add_nodes_from([";
     for (std::vector<unsigned int>::const_iterator it_vert = vertices.begin(); it_vert != vertices.end(); it_vert++) {
       fileout << *it_vert << ", ";
     }
     fileout << "])\n";
 
     // Populate edges
-    fileout << "G" << evtNum << "_" << trkNum << ".add_edges_from([";
+    fileout << "graphs[" << evtNum << "][" << trkNum << "]['graph'].add_edges_from([";
     for (auto edge : edges) {
       fileout << "(" << edge[0] << "," << edge[1] << ")" << ", ";
     }
     fileout << "])\n";
 
     // Get weights
-    fileout << "weight1_" << evtNum << "_" << trkNum << " = {";
-    for (auto edge : edges) {
-      const auto cluster1 = layerClusters->at(edge[0]);
-      const auto cluster2 = layerClusters->at(edge[1]);
-      double weight = ticl::calcWeight(1, cluster1, cluster2, 1);
-      fileout << "(" << edge[0] << "," << edge[1] << ") : " << weight << ", ";
+    for (size_t iW = 1; iW < 5; ++iW) {
+      fileout << "graphs[" << evtNum << "][" << trkNum << "]['weight" << iW << "'] = {";
+      for (auto edge : edges) {
+        const auto cluster1 = layerClusters->at(edge[0]);
+        const auto cluster2 = layerClusters->at(edge[1]);
+        double weight = ticl::calcWeight(iW, cluster1, cluster2, 1);
+        fileout << "(" << edge[0] << "," << edge[1] << ") : " << weight << ", ";
+      }
+      fileout << "}\n";
     }
-    fileout << "}\n";
-    fileout << "weight2_" << evtNum << "_" << trkNum << " = {";
-    for (auto edge : edges) {
-      const auto cluster1 = layerClusters->at(edge[0]);
-      const auto cluster2 = layerClusters->at(edge[1]);
-      double weight = ticl::calcWeight(2, cluster1, cluster2, 1);
-      fileout << "(" << edge[0] << "," << edge[1] << ") : " << weight << ", ";
-    }
-    fileout << "}\n";
-    fileout << "weight3_" << evtNum << "_" << trkNum << " = {";
-    for (auto edge : edges) {
-      const auto cluster1 = layerClusters->at(edge[0]);
-      const auto cluster2 = layerClusters->at(edge[1]);
-      double weight = ticl::calcWeight(3, cluster1, cluster2, 1);
-      fileout << "(" << edge[0] << "," << edge[1] << ") : " << weight << ", ";
-    }
-    fileout << "}\n";
-    fileout << "weight4_" << evtNum << "_" << trkNum << " = {";
-    for (auto edge : edges) {
-      const auto cluster1 = layerClusters->at(edge[0]);
-      const auto cluster2 = layerClusters->at(edge[1]);
-      double weight = ticl::calcWeight(4, cluster1, cluster2, 1);
-      fileout << "(" << edge[0] << "," << edge[1] << ") : " << weight << ", ";
-    }
-    fileout << "}\n";
 
     // Fill energies
-    fileout << "energy_" << evtNum << "_" << trkNum << " = {";
+    fileout << "graphs[" << evtNum << "][" << trkNum << "]['energy'] = {";
     for (std::vector<unsigned int>::const_iterator it_vert = vertices.begin(); it_vert != vertices.end(); it_vert++) {
       auto cluster = layerClusters->at(*it_vert);
       fileout << *it_vert << ": " << cluster.energy() << ", ";
@@ -138,45 +119,45 @@ void TrackstersPrintout::analyze(const edm::Event& iEvent, const edm::EventSetup
     Eigen::MatrixXd adj[5];
     Eigen::VectorXd c_eig[5], c_katz[5], c_pr[5];
 
-    for (size_t i = 0; i < 5; ++i) {
+    for (size_t iW = 0; iW < 5; ++iW) {
       // Fill adjacency matrix
-      adj[i] = ticl::adjacency(i, false, vertices, edges, layerClusters);
+      adj[iW] = ticl::adjacency(iW, false, vertices, edges, layerClusters);
 
       // Compute eigenvalues & eigenvectors
-      c_eig[i] = ticl::centralityEigenvector(adj[i]);
+      c_eig[iW] = ticl::centralityEigenvector(adj[iW]);
 
       // Katz centrality calculation
-      c_katz[i] = ticl::centralityKatz(adj[i]);
+      c_katz[iW] = ticl::centralityKatz(adj[iW]);
 
       // PageRank calculation
-      c_pr[i] = ticl::centralityPageRank(adj[i]);
+      c_pr[iW] = ticl::centralityPageRank(adj[iW]);
 
       // Send to output
       size_t j = 0;
-      fileout << "cEig_wt" << i << "_" << evtNum << "_" << trkNum << " = {";
+      fileout << "graphs[" << evtNum << "][" << trkNum << "]['cEig_wt" << iW << "'] = {";
       for (std::vector<unsigned int>::const_iterator it_vert = vertices.begin(); it_vert != vertices.end(); it_vert++) {
-        fileout << *it_vert << ": " << c_eig[i][j] << ", ";
+        fileout << *it_vert << ": " << c_eig[iW][j] << ", ";
         ++j;
       }
       fileout << "}\n";
       j = 0;
-      fileout << "cKatz_wt" << i << "_" << evtNum << "_" << trkNum << " = {";
+      fileout << "graphs[" << evtNum << "][" << trkNum << "]['cKatz_wt" << iW << "'] = {";
       for (std::vector<unsigned int>::const_iterator it_vert = vertices.begin(); it_vert != vertices.end(); it_vert++) {
-        fileout << *it_vert << ": " << c_katz[i][j] << ", ";
+        fileout << *it_vert << ": " << c_katz[iW][j] << ", ";
         ++j;
       }
       fileout << "}\n";
       j = 0;
-      fileout << "cPR_wt" << i << "_" << evtNum << "_" << trkNum << " = {";
+      fileout << "graphs[" << evtNum << "][" << trkNum << "]['cPR_wt" << iW << "'] = {";
       for (std::vector<unsigned int>::const_iterator it_vert = vertices.begin(); it_vert != vertices.end(); it_vert++) {
-        fileout << *it_vert << ": " << c_pr[i][j] << ", ";
+        fileout << *it_vert << ": " << c_pr[iW][j] << ", ";
         ++j;
       }
       fileout << "}\n";
     }
 
+    fileout << "\n";
     trkNum++;
-    fileout << "}\n";
 
     // Debugging stuff
     if (debug) {
@@ -192,7 +173,13 @@ void TrackstersPrintout::analyze(const edm::Event& iEvent, const edm::EventSetup
 }
 
 void TrackstersPrintout::beginJob() {
-  fileout << "import networkx as nx\n\n";
+  // Let's print a nice message at the top of the script
+  fileout << "# This script has been generated automatically by the TrackstersPrintout plugin.\n";
+  fileout << "# The main exportable object is be named 'graphs'. It is a list of lists with format\n";
+  fileout << "# graphs[# of event][# of trackster in event]. Each entry is a dictionary that contains\n";
+  fileout << "# entries for the graph, the energies, the weights, and the centralities.\n";
+  fileout << "\nimport networkx as nx\n\n";
+  fileout << "graphs = {}\n\n";
 }
 
 void TrackstersPrintout::endJob() {}
