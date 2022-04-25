@@ -59,7 +59,7 @@ namespace ticl {
       adj(idx0,idx1) = weight;
       if (!isDirected) adj(idx1,idx0) = weight;
     }
-    return adj;
+    return adj/adj.maxCoeff();
   }
 
   Eigen::VectorXd centralityEigenvector(const Eigen::MatrixXd& adj) {

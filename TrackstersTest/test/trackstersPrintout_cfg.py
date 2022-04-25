@@ -1,5 +1,5 @@
 #
-# This script runs the module TrackstersTest.
+# This script runs the plugin TrackstersPrintout.
 #
 
 import FWCore.ParameterSet.Config as cms
@@ -10,7 +10,7 @@ process.load('RecoHGCal.Configuration.recoHGCAL_cff')
 process.load('Configuration.EventContent.EventContent_cff')
 process.load("FWCore.MessageService.MessageLogger_cfi")
 
-process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(5) )
+process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(1) )
 
 # Options below are for CA
 #delta = '1p5'
@@ -30,7 +30,7 @@ directory = "/store/user/chpapage/CloseByDoubleGamma_E25Eta1p88Delta"+delta+\
 
 process.source = cms.Source("PoolSource",
     fileNames = cms.untracked.vstring(
-        directory+"step3_1.root",
+        "file:step3_delta1p5_clue3Dv3.root",
     ),
     duplicateCheckMode = cms.untracked.string("noDuplicateCheck")
 )

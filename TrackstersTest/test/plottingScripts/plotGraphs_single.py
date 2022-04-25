@@ -33,8 +33,8 @@ from graphsCLUE3D import graphs
 # Input section
 evtNum = 5
 trkNum = 1
-weightMode = 4
-heatmapMode = 3
+weightMode = 0
+heatmapMode = 1
 layout = 2
 node_size = 300
 heatmapRangeMargin = 0.005 # Sets the lower and the upper margin for the range of the heatmap

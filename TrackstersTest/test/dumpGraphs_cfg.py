@@ -1,5 +1,5 @@
 #
-# This script runs the module TrackstersTest.
+# This script runs the plugin GraphDump.
 #
 
 import FWCore.ParameterSet.Config as cms
@@ -31,11 +31,12 @@ directory = "/store/user/chpapage/CloseByDoubleGamma_E25Eta1p88Delta"+delta+\
 process.source = cms.Source("PoolSource",
     fileNames = cms.untracked.vstring(
         "file:step3_delta1p5_clue3Dv3.root",
+#        directory+"step3_1.root",
     ),
     duplicateCheckMode = cms.untracked.string("noDuplicateCheck")
 )
 
-process.ana = cms.EDAnalyzer('TrackstersPrintout',
+process.ana = cms.EDAnalyzer('GraphDump',
     isCLUE3D = cms.bool(isCLUE3D)
 )
 
