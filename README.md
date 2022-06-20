@@ -9,7 +9,18 @@ cd CMSSW_X_Y_Z/src
 git clone git@github.com:chrispap95/Tracksters.git
 scram b -j 4
 ```
-**Use CMSSW_12_4_0_pre2 as of April 2022**
+**Use at least CMSSW_12_4_0_pre2 as of June 2022**
+
+## Setup instruction for TICL Hackathon samples
+```bash
+cmsrel CMSSW_12_4_0_pre2
+cd CMSSW_12_4_0_pre2/src
+git cms-init
+git cms-checkout-topic Abhirikshma:TICLHackathon
+git clone git@github.com:chrispap95/Tracksters.git
+scram b -j 4
+```
+
 
 The main algorithms reside in `TrackstersTest/src/TracksterUtilities.cc`.
 
